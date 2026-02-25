@@ -67,7 +67,7 @@ void hashmap_destroy(Hashmap *map) {
 /* Insert an item to a hashmap */
 const char *hashmap_insert(Hashmap *map, const char *key, const size_t keySize, const char *value, const size_t valueSize) {
 
-    if(hashmap_find(&map, key, keySize)) {
+    if(hashmap_find(map, key, keySize)) {
         return NULL; //Duplicate
     }
 
