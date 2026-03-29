@@ -1,5 +1,5 @@
 #include "../packet.h"
-
+#include <signal.h>
 
 
 int main(void) {
@@ -25,7 +25,9 @@ int main(void) {
         if(!process_packet(&packet, response)) {
             continue;
         }
-    } 
+    }
+
+
 
     return 0;
 }

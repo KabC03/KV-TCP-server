@@ -1,5 +1,8 @@
 #ifndef PACKET_H
 #define PACKET_H 
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
