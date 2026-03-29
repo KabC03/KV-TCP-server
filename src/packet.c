@@ -1,4 +1,7 @@
 #include "./packet.h"
+#define PORT 9000
+
+
 const char *OPERATION_KEYWORDS[] = {
     "connect",
     "insert",
@@ -54,6 +57,9 @@ bool create_packet(char *input, Packet *packetOut) {
     }
 
     char *operation = strtok(input, " \r\n");
+    if(!operation) {
+        return false;
+    }
     char *field1 = strtok(NULL, " \r\n");
     char *field2 = strtok(NULL, " \r\n");
     char *field3 = strtok(NULL, " \r\n");
@@ -126,6 +132,7 @@ bool create_packet(char *input, Packet *packetOut) {
 bool process_packet(Packet *packet, char *response) {
 
     static bool connected = false;
+    static int sockfd = -1; //Only allow connection to one server for now
     if(!connected && packet->metadata.op != CONNECT) {
         printf("Not connected to server\n");
         return false;
@@ -133,17 +140,126 @@ bool process_packet(Packet *packet, char *response) {
 
     switch(packet->metadata.op) {
         case CONNECT: {
-            
+           
+            printf("\tAttempting connection to '%s'\n", packet->data.field1);
+
+            sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+            if(sockfd < 0) {
+                printf("Socket establishment error\n");
+                return false;
+            }
+
+            struct sockaddr_in serverAddr;
+            memset(&serverAddr, 0, sizeof(serverAddr));
+            serverAddr.sin_family = AF_INET;
+            serverAddr.sin_port = htons(PORT);
+
+            if(inet_pton(AF_INET, packet->data.field1, &(serverAddr.sin_addr)) <= 0) {
+                printf("inet_pton error\n");
+                close(sockfd);
+                return false;
+            }
+
+            if(connect(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+                printf("Connection error: %s\n", strerror(errno));
+                close(sockfd);
+                return false;
+            }
+            printf("Connected\n");
+            connected = true;
+
+
+
+            return true;
+
         } case INSERT: {
+            //Send operation, key, value
+
+            ssize_t sent = send(sockfd, &(packet->metadata.op), sizeof(packet->metadata.op), 0);
+            if(sent < 0) {
+                printf("Error sending operation to server\n");
+                return false;
+            }
+
+            sent = send(sockfd, packet->data.field1, packet->metadata.field1Length, 0); //Key
+            if(sent < 0) {
+                printf("Error sending field_1 to server\n");
+                return false;
+            }
+
+            sent = send(sockfd, packet->data.field2, packet->metadata.field2Length, 0); //Value
+            if(sent < 0) {
+                printf("Error sending field_2 to server\n");
+                return false;
+            }
+
+            return true;
 
         } case DELETE: {
 
+            //Send operation, key
+
+            ssize_t sent = send(sockfd, &(packet->metadata.op), sizeof(packet->metadata.op), 0);
+            if(sent < 0) {
+                printf("Error sending operation to server\n");
+                return false;
+            }
+
+            sent = send(sockfd, packet->data.field1, packet->metadata.field1Length, 0); //Key
+            if(sent < 0) {
+                printf("Error sending field_1 to server\n");
+                return false;
+            }
+
+            return true;
+
         } case LOOKUP: {
+
+            //Send operation, key
+
+            ssize_t sent = send(sockfd, &(packet->metadata.op), sizeof(packet->metadata.op), 0);
+            if(sent < 0) {
+                printf("Error sending operation to server\n");
+                return false;
+            }
+
+            sent = send(sockfd, packet->data.field1, packet->metadata.field1Length, 0); //Key
+            if(sent < 0) {
+                printf("Error sending field_1 to server\n");
+                return false;
+            }
+
+
+            response[MAX_INPUT_SIZE - 1] = '\0';
+            if(recv(sockfd, response, MAX_INPUT_SIZE, 0) <= 0) {
+                printf("Incomplete stream recieved from server\n");
+                return false;
+            }
+            if(response[MAX_INPUT_SIZE - 1] != '\0') {
+                printf("Server response overflowed client buffer\n");
+                return false;
+            }
+            return true;
 
         } case REHASH: {
 
+            ssize_t sent = send(sockfd, &(packet->metadata.op), sizeof(packet->metadata.op), 0);
+            if(sent < 0) {
+                printf("Error sending operation to server\n");
+                return false;
+            }
+
+            sent = send(sockfd, &(packet->data.field3), sizeof(packet->data.field3), 0); //New size
+            if(sent < 0) {
+                printf("Error sending field_3 to server\n");
+                return false;
+            }
+            return true;
+
         } case TERMINATE: {
 
+            close(sockfd);
+            return true;
         }
     }
 
