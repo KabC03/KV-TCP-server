@@ -1,5 +1,4 @@
-#include "./packet.h"
-#define PORT 9000
+#include "../packet.h"
 
 
 const char *OPERATION_KEYWORDS[] = {
