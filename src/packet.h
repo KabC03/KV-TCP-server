@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #define MAX_INPUT_SIZE 1000
+#define PORT 9000
 
 typedef enum OPERATION {
     CONNECT, //Connect to a server
