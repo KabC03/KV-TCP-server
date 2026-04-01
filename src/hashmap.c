@@ -13,7 +13,7 @@ typedef struct Node {
 
 /* hashmap_djb2 */
 /* Implementation of djb2 hash */
-const size_t hashmap_djb2(const char *key, size_t keySize) {
+size_t hashmap_djb2(char *key, size_t keySize) {
     size_t hash = 5381;
     for(size_t i = 0; i < keySize; ++i) {
         hash = ((hash * 33)) + (unsigned char)(key[i]);
@@ -25,7 +25,7 @@ const size_t hashmap_djb2(const char *key, size_t keySize) {
 
 /* hashmap_init */
 /* Initialise a hashmap for use */
-bool hashmap_init(Hashmap *map, const size_t size, const size_t (*hashFunction)(const char *key, size_t keySize)) {
+bool hashmap_init(Hashmap *map, size_t size, size_t (*hashFunction)(char *key, size_t keySize)) {
     map->hashFunction = hashFunction;
     map->numBuckets = size;
     map->buckets = calloc(size, sizeof(Node*));
@@ -65,7 +65,7 @@ void hashmap_destroy(Hashmap *map) {
 
 /* hashmap_insert */
 /* Insert an item to a hashmap */
-const char *hashmap_insert(Hashmap *map, const char *key, const size_t keySize, const char *value, const size_t valueSize) {
+char *hashmap_insert(Hashmap *map, char *key, size_t keySize, char *value, size_t valueSize) {
 
     if(hashmap_find(map, key, keySize)) {
         return NULL; //Duplicate
@@ -101,7 +101,7 @@ const char *hashmap_insert(Hashmap *map, const char *key, const size_t keySize, 
 
 /* hashmap_find */
 /* Find an item in a hashmap (if present) */
-const char *hashmap_find(const Hashmap *map, const char *key, const size_t keySize) { 
+char *hashmap_find(Hashmap *map, char *key, size_t keySize) { 
     //Note - returns a char* since it should be NULL terminated
 
     size_t bucketIndex = map->hashFunction(key, keySize) % map->numBuckets;
@@ -122,7 +122,7 @@ const char *hashmap_find(const Hashmap *map, const char *key, const size_t keySi
 
 /* hashmap_edit */
 /* Edit a value associated with a key in a hashmap */
-const char *hashmap_edit(Hashmap *map, const char *key, const size_t keySize, const char *newValue, const size_t newValueSize) {
+char *hashmap_edit(Hashmap *map, char *key, size_t keySize, char *newValue, size_t newValueSize) {
     size_t bucketIndex = map->hashFunction(key, keySize) % map->numBuckets;
 
     Node *node = map->buckets[bucketIndex]; 
@@ -148,7 +148,7 @@ const char *hashmap_edit(Hashmap *map, const char *key, const size_t keySize, co
 
 /* hashmap_delete */
 /* Delete an item from a hashmap */
-bool hashmap_delete(Hashmap *map, const char *key, const size_t keySize) {
+bool hashmap_delete(Hashmap *map, char *key, size_t keySize) {
 
     size_t bucketIndex = map->hashFunction(key, keySize) % map->numBuckets;
 
@@ -185,7 +185,7 @@ bool hashmap_delete(Hashmap *map, const char *key, const size_t keySize) {
 
 /* hashmap_rehash */
 /* Reallocate and rehash an entire map */
-bool hashmap_rehash(Hashmap *map, const size_t newSize, const size_t (*hashFunction)(const char *key, size_t keySize)) {
+bool hashmap_rehash(Hashmap *map, size_t newSize, size_t (*hashFunction)(char *key, size_t keySize)) {
 
 
     Node **newBuckets = calloc(newSize, sizeof(Node*));
@@ -224,7 +224,7 @@ bool hashmap_rehash(Hashmap *map, const size_t newSize, const size_t (*hashFunct
 
 /* hashmap_display */
 /* Display a hashmaps contents */
-void hashmap_display(const Hashmap *map) {
+void hashmap_display(Hashmap *map) {
 
     for(size_t i = 0; i < map->numBuckets; i++) {
         Node *bucket = map->buckets[i];

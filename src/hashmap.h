@@ -11,7 +11,7 @@ typedef struct Hashmap {
 
     Node **buckets;
     size_t numBuckets;
-    const size_t (*hashFunction)(const char *key, size_t keySize); 
+    size_t (*hashFunction)(char *key, size_t keySize); 
     //Fptr does have overhead, but this is negligible next to the LL traversal cost 
 
     //Usually good practise to include a destructor fptr for elements
@@ -25,9 +25,9 @@ typedef struct Hashmap {
  * @param key :: Key to hash
  * @param keySize :: Size of key to hash (bytes)
  * 
- * @return const size_t :: Hash of key (djb2)
+ * @return size_t :: Hash of key (djb2)
  */
-const size_t hashmap_djb2(const char *key, size_t keySize);
+size_t hashmap_djb2(char *key, size_t keySize);
 
 
 /** 
@@ -40,7 +40,7 @@ const size_t hashmap_djb2(const char *key, size_t keySize);
  * 
  * @return bool :: Returns true if map was successfully allocated and false if the alloaction failed
  */
-bool hashmap_init(Hashmap *map, const size_t size, const size_t (*hashFunction)(const char *key, size_t keySize));
+bool hashmap_init(Hashmap *map, size_t size, size_t (*hashFunction)(char *key, size_t keySize));
 
 
 
@@ -64,9 +64,9 @@ void hashmap_destroy(Hashmap *map);
  * @param value :: Pointer to the value data
  * @param valueSize :: Size of the value inserted (bytes)
  * 
- * @return const char* :: Pointer to new item in the map, returns NULL if insertion failed (map is unaltered)
+ * @return char* :: Pointer to new item in the map, returns NULL if insertion failed (map is unaltered)
  */
-const char *hashmap_insert(Hashmap *map, const char *key, const size_t keySize, const char *value, const size_t valueSize);
+char *hashmap_insert(Hashmap *map, char *key, size_t keySize, char *value, size_t valueSize);
 
 
 
@@ -77,9 +77,9 @@ const char *hashmap_insert(Hashmap *map, const char *key, const size_t keySize, 
  * @param key :: Key to be searched for
  * @param keySize :: Size of the key to be searched for (bytes)
  * 
- * @return const char* :: Pointer to item if the map (if present), otherwise NULL is returned
+ * @return char* :: Pointer to item if the map (if present), otherwise NULL is returned
  */
-const char *hashmap_find(const Hashmap *map, const char *key, const size_t keySize);
+char *hashmap_find(Hashmap *map, char *key, size_t keySize);
 
 
 /** 
@@ -91,9 +91,9 @@ const char *hashmap_find(const Hashmap *map, const char *key, const size_t keySi
  * @param newValue :: Pointer to the new value data
  * @param newValueSize :: Size of the new value inserted (bytes)
  * 
- * @return const char* :: Pointer to new item in the map, returns NULL if edit failed, or the item isnt present (map is unaltered)
+ * @return char* :: Pointer to new item in the map, returns NULL if edit failed, or the item isnt present (map is unaltered)
  */
-const char *hashmap_edit(Hashmap *map, const char *key, const size_t keySize, const char *newValue, const size_t newValueSize);
+char *hashmap_edit(Hashmap *map, char *key, size_t keySize, char *newValue, size_t newValueSize);
 
 
 /** 
@@ -105,7 +105,7 @@ const char *hashmap_edit(Hashmap *map, const char *key, const size_t keySize, co
  *
  * @return bool :: Returns true if item was found and deleted, false if item is not present
  */
-bool hashmap_delete(Hashmap *map, const char *key, const size_t keySize);
+bool hashmap_delete(Hashmap *map, char *key, size_t keySize);
 
 
 
@@ -119,7 +119,7 @@ bool hashmap_delete(Hashmap *map, const char *key, const size_t keySize);
  * 
  * @return bool :: Returns true if rehash was successful, and false if it was unsucessful (map is unaltered)
  */
-bool hashmap_rehash(Hashmap *map, const size_t newSize, const size_t (*hashFunction)(const char *key, size_t keySize));
+bool hashmap_rehash(Hashmap *map, size_t newSize, size_t (*hashFunction)(char *key, size_t keySize));
 
 
 
@@ -130,6 +130,6 @@ bool hashmap_rehash(Hashmap *map, const size_t newSize, const size_t (*hashFunct
  *
  * @return void :: None 
  */
-void hashmap_display(const Hashmap *map);
+void hashmap_display(Hashmap *map);
 
 #endif

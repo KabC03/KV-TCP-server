@@ -50,8 +50,14 @@ typedef struct Packet {
  */
 bool create_packet(char *input, Packet *packetOut);
 
-
-
+/**
+ * @brief Clean an input string removing unwanted spaces and newlines
+ * 
+ * @param string :: String to clean 
+ * 
+ * @return void ::
+ */
+void clean_input(char *string);
 
 /** 
  * @brief Process a packet 
