@@ -1,6 +1,16 @@
 #include "packet.h"
 #include "hashmap.h"
 
+
+/**
+ * @brief Send exact number of bytes over a socket
+ * 
+ * @param sockfd :: Connected socket file descriptor
+ * @param buffer :: Buffer containing data 
+ * @param length :: Number of bytes to send
+ * 
+ * @return bool :: Returns true if all bytes were sent
+ */
 static bool send_all(int sockfd, const void *buffer, size_t length) {
     const char *ptr = (const char *)buffer;
     size_t totalSent = 0;
@@ -16,6 +26,17 @@ static bool send_all(int sockfd, const void *buffer, size_t length) {
     return true;
 }
 
+
+
+/**
+ * @brief Receive a number of bytes from a socket
+ * 
+ * @param sockfd :: Connected socket file descriptor
+ * @param buffer :: Destination buffer for received data
+ * @param length :: Number of bytes to receive
+ * 
+ * @return bool :: Returns true if all bytes were received
+ */
 static bool recv_all(int sockfd, void *buffer, size_t length) {
     char *ptr = (char *)buffer;
     size_t totalRecv = 0;
@@ -31,6 +52,17 @@ static bool recv_all(int sockfd, void *buffer, size_t length) {
     return true;
 }
 
+
+
+
+/**
+ * @brief Process packets from client
+ * 
+ * @param clientfd :: Connected client socket descriptor
+ * @param map :: Hashmap database 
+ * 
+ * @return bool :: Returns true if client terminated normally
+ */
 static bool handle_client(int clientfd, Hashmap *map) {
     while(true) {
         Packet packet;
@@ -183,6 +215,15 @@ static bool handle_client(int clientfd, Hashmap *map) {
     return true;
 }
 
+
+
+/**
+ * @brief Start the TCP key-value server
+ * 
+ * @param void :: None
+ * 
+ * @return int :: Exit status code
+ */
 int main(void) {
     int serverfd = socket(AF_INET, SOCK_STREAM, 0);
     if(serverfd < 0) {

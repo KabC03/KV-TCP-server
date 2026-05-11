@@ -1,5 +1,15 @@
 #include "./packet.h"
 
+
+
+
+/**
+ * @brief Start the TCP client interface
+ * 
+ * @param void :: None
+ * 
+ * @return int :: Exit status code
+ */
 int main(void) {
     char input[MAX_INPUT_SIZE];
     char response[MAX_INPUT_SIZE];
